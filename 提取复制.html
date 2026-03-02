@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>预设提取工具</title>
+<style>
+  :root {
+    --bg: #f8f9fa;
+    --card-bg: #ffffff;
+    --border: #e0e0e0;
+    --text: #2c3e50;
+    --text-secondary: #7f8c8d;
+    --accent: #3498db;
+    --accent-hover: #2980b9;
+    --enabled: #27ae60;
+    --disabled: #e74c3c;
+    --system: #8e44ad;
+    --user: #2980b9;
+    --assistant: #e67e22;
+    --marker: #f39c12;
+    --shadow: 0 2px 8px rgba(0,0,0,0.08);
+    --selected-border: #3498db;
+    --selected-bg: rgba(52,152,219,0.04);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: white;
+    padding: 30px 20px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  .header h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; letter-spacing: 1px; }
+  .header p { opacity: 0.8; font-size: 14px; }
+
+  /* Container */
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  /* Import Area */
+  .import-area {
+    background: var(--card-bg);
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 40px 20px;
+    text-align: center;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+    cursor: pointer;
+    position: relative;
+  }
+  .import-area:hover, .import-area.drag-over {
+    border-color: var(--accent);
+    background: #f0f8ff;
+  }
+  .import-area .icon { font-size: 48px; margin-bottom: 10px; }
+  .import-area .label { font-size: 16px; color: var(--text-secondary); margin-bottom: 12px; }
+  .import-area input[type="file"] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer;
+  }
+  .import-area .btn-import {
+    display: inline-block;
+    background: var(--accent);
+    color: white;
+    padding: 10px 28px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    pointer-events: none;
+  }
+
+  /* Stats Bar */
+  .stats-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .stat-card {
+    flex: 1; min-width: 120px;
+    background: var(--card-bg);
+    border-radius: 10px;
+    padding: 14px 18px;
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+  .stat-card .num { font-size: 28px; font-weight: 700; color: var(--accent); }
+  .stat-card .desc { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+  /* Controls */
+  .controls {
+    background: var(--card-bg);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+  .controls label { font-size: 13px; color: var(--text-secondary); font-weight: 600; }
+  .controls select, .controls input[type="text"] {
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+    background: white;
+    color: var(--text);
+    outline: none;
+  }
+  .controls select:focus, .controls input:focus { border-color: var(--accent); }
+  .controls input[type="text"] { flex: 1; min-width: 180px; }
+
+  .btn {
+    padding: 8px 18px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+  .btn-outline:hover { background: var(--bg); }
+  .btn-export { background: #27ae60; color: white; }
+  .btn-export:hover { background: #219a52; }
+
+  /* Model Params */
+  .params-section {
+    background: var(--card-bg);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+  }
+  .params-section h3 {
+    font-size: 15px; margin-bottom: 12px; color: var(--text);
+    border-bottom: 1px solid var(--border); padding-bottom: 8px;
+  }
+  .params-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 8px;
+  }
+  .param-item {
+    display: flex; justify-content: space-between;
+    padding: 6px 10px; border-radius: 4px; background: var(--bg);
+    font-size: 13px;
+  }
+  .param-item .key { color: var(--text-secondary); }
+  .param-item .val { font-weight: 600; font-family: "Courier New", monospace; }
+
+  /* Prompt Card */
+  .prompt-list { display: flex; flex-direction: column; gap: 12px; }
+
+  .prompt-card {
+    background: var(--card-bg);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    border-left: 4px solid var(--border);
+    transition: 0.2s;
+  }
+  .prompt-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
+  .prompt-card.enabled { border-left-color: var(--enabled); }
+  .prompt-card.disabled { border-left-color: var(--disabled); opacity: 0.7; }
+  .prompt-card.is-marker { border-left-color: var(--marker); }
+
+  /* Selected state */
+  .prompt-card.selected {
+    border-left-color: var(--selected-border) !important;
+    background: var(--selected-bg);
+    box-shadow: 0 0 0 2px var(--selected-border), 0 4px 16px rgba(52,152,219,0.15);
+    opacity: 1 !important;
+  }
+
+  .prompt-header {
+    display: flex;
+    align-items: center;
+    padding: 14px 18px;
+    cursor: pointer;
+    gap: 12px;
+    user-select: none;
+  }
+  .prompt-header:hover { background: rgba(0,0,0,0.02); }
+
+  /* Checkbox in header */
+  .prompt-checkbox {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    background: white;
+    position: relative;
+  }
+  .prompt-checkbox:hover {
+    border-color: var(--accent);
+  }
+  .prompt-checkbox.checked {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .prompt-checkbox.checked::after {
+    content: '✓';
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  /* Selection order badge */
+  .select-order-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #e74c3c;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+
+  .prompt-index {
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+    background: var(--text-secondary);
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .prompt-card.enabled .prompt-index { background: var(--enabled); }
+
+  .prompt-info { flex: 1; min-width: 0; }
+  .prompt-name {
+    font-size: 15px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .prompt-meta {
+    display: flex; gap: 8px; margin-top: 4px; flex-wrap: wrap;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .tag-role-system { background: rgba(142,68,173,0.12); color: var(--system); }
+  .tag-role-user { background: rgba(41,128,185,0.12); color: var(--user); }
+  .tag-role-assistant { background: rgba(230,126,34,0.12); color: var(--assistant); }
+  .tag-enabled { background: rgba(39,174,96,0.12); color: var(--enabled); }
+  .tag-disabled { background: rgba(231,76,60,0.12); color: var(--disabled); }
+  .tag-marker { background: rgba(243,156,18,0.12); color: var(--marker); }
+  .tag-sys-prompt { background: rgba(52,152,219,0.08); color: var(--accent); }
+  .tag-injection {
+    background: rgba(0,0,0,0.05); color: var(--text-secondary); font-size: 10px;
+  }
+
+  .prompt-toggle {
+    font-size: 18px; color: var(--text-secondary);
+    transition: transform 0.3s;
+    flex-shrink: 0;
+  }
+  .prompt-card.open .prompt-toggle { transform: rotate(180deg); }
+
+  .prompt-body {
+    display: none;
+    padding: 0 18px 16px;
+    border-top: 1px solid var(--border);
+  }
+  .prompt-card.open .prompt-body { display: block; }
+
+  .prompt-content-wrapper {
+    margin-top: 12px;
+  }
+  .prompt-content-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .copy-btn {
+    font-size: 11px;
+    padding: 2px 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: 0.2s;
+  }
+  .copy-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
+  .copy-btn.copied { background: var(--enabled); color: white; border-color: var(--enabled); }
+
+  .prompt-content {
+    background: #f5f6f8;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 13px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: "Courier New", "Noto Sans SC", monospace;
+    max-height: 400px;
+    overflow-y: auto;
+    color: #333;
+  }
+
+  .prompt-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .detail-item {
+    font-size: 12px; padding: 4px 8px; background: var(--bg); border-radius: 4px;
+  }
+  .detail-item .dk { color: var(--text-secondary); }
+  .detail-item .dv { font-weight: 600; }
+
+  /* No data */
+  .no-data {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-secondary);
+    font-size: 15px;
+  }
+  .no-data .nd-icon { font-size: 64px; margin-bottom: 10px; opacity: 0.5; }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 30px 20px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .header h1 { font-size: 22px; }
+    .controls { flex-direction: column; }
+    .stat-card { min-width: 80px; }
+    .prompt-name { font-size: 14px; }
+  }
+
+  /* Expand/Collapse all */
+  .toolbar {
+    display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center;
+  }
+  .toolbar .count-label { margin-left: auto; font-size: 13px; color: var(--text-secondary); }
+
+  /* ====== Multi-Select Floating Bar ====== */
+  .select-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: white;
+    padding: 0;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.25);
+    z-index: 1000;
+    transform: translateY(100%);
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+  }
+  .select-bar.visible {
+    transform: translateY(0);
+  }
+  .select-bar-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .select-bar .sel-info {
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .select-bar .sel-count {
+    background: var(--accent);
+    color: white;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .select-bar .sel-chars {
+    font-size: 12px;
+    opacity: 0.7;
+  }
+  .select-bar-actions {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+    align-items: center;
+  }
+  .select-bar .btn-sel {
+    padding: 8px 18px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .btn-preview {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3) !important;
+  }
+  .btn-preview:hover { background: rgba(255,255,255,0.25); }
+  .btn-copy-all {
+    background: var(--accent) !important;
+    color: white;
+  }
+  .btn-copy-all:hover { background: var(--accent-hover) !important; }
+  .btn-copy-all.copied { background: var(--enabled) !important; }
+  .btn-clear-sel {
+    background: transparent;
+    color: rgba(255,255,255,0.7);
+    border: 1px solid rgba(255,255,255,0.2) !important;
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+  .btn-clear-sel:hover { color: white; border-color: rgba(255,255,255,0.5) !important; }
+
+  /* Separator selector */
+  .sep-selector {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    opacity: 0.85;
+  }
+  .sep-selector label { font-size: 12px; color: rgba(255,255,255,0.7); }
+  .sep-selector select {
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.1);
+    color: white;
+    font-size: 12px;
+    outline: none;
+  }
+  .sep-selector select option { color: #333; background: white; }
+
+  /* ====== Preview Modal ====== */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.visible {
+    display: flex;
+  }
+  .modal {
+    background: var(--card-bg);
+    border-radius: 14px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    width: 100%;
+    max-width: 860px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: modalIn 0.3s ease;
+  }
+  @keyframes modalIn {
+    from { transform: scale(0.95) translateY(20px); opacity: 0; }
+    to { transform: scale(1) translateY(0); opacity: 1; }
+  }
+  .modal-header {
+    display: flex;
+    align-items: center;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+  }
+  .modal-header h3 { flex: 1; font-size: 17px; }
+  .modal-header .modal-close {
+    width: 32px; height: 32px;
+    border: none;
+    background: var(--bg);
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+    color: var(--text-secondary);
+  }
+  .modal-header .modal-close:hover { background: #eee; color: var(--text); }
+
+  .modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 24px;
+  }
+  .modal-body .selected-list {
+    margin-bottom: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .modal-body .selected-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: rgba(52,152,219,0.1);
+    color: var(--accent);
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .selected-chip .chip-num {
+    background: var(--accent);
+    color: white;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+  }
+  .modal-body .combined-text {
+    background: #f5f6f8;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+    font-size: 13px;
+    line-height: 1.8;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: "Courier New", "Noto Sans SC", monospace;
+    max-height: 50vh;
+    overflow-y: auto;
+    color: #333;
+  }
+  .modal-footer {
+    padding: 14px 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    align-items: center;
+  }
+  .modal-footer .char-info {
+    margin-right: auto;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  /* Select-all checkbox in toolbar */
+  .select-all-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    user-select: none;
+  }
+  .select-all-wrap:hover { color: var(--text); }
+  .select-all-cb {
+    width: 18px; height: 18px; cursor: pointer; accent-color: var(--accent);
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📜 预设提取工具</h1>
+  <p>导入 SillyTavern 预设 JSON，按顺序提取姓名、角色、提示词等内容 · 支持多选拼接</p>
+</div>
+
+<div class="container">
+
+  <!-- Import -->
+  <div class="import-area" id="importArea">
+    <div class="icon">📂</div>
+    <div class="label">拖拽 JSON 文件到此处，或点击选择文件</div>
+    <div class="btn-import">选择 JSON 文件</div>
+    <input type="file" id="fileInput" accept=".json">
+  </div>
+
+  <!-- File info -->
+  <div id="fileInfo" style="display:none"></div>
+
+  <!-- Stats -->
+  <div class="stats-bar" id="statsBar" style="display:none"></div>
+
+  <!-- Model Parameters -->
+  <div class="params-section" id="paramsSection" style="display:none"></div>
+
+  <!-- Controls -->
+  <div class="controls" id="controlsBar" style="display:none">
+    <label>筛选:</label>
+    <select id="filterStatus">
+      <option value="all">全部状态</option>
+      <option value="enabled">已启用</option>
+      <option value="disabled">已禁用</option>
+    </select>
+    <select id="filterRole">
+      <option value="all">全部角色</option>
+      <option value="system">System</option>
+      <option value="user">User</option>
+      <option value="assistant">Assistant</option>
+    </select>
+    <select id="filterType">
+      <option value="all">全部类型</option>
+      <option value="normal">普通提示词</option>
+      <option value="marker">标记(Marker)</option>
+    </select>
+    <input type="text" id="searchInput" placeholder="🔍 搜索名称或内容...">
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar" id="toolbar" style="display:none">
+    <label class="select-all-wrap" title="全选/取消全选当前可见条目">
+      <input type="checkbox" class="select-all-cb" id="selectAllCb" onchange="toggleSelectAll(this.checked)">
+      全选
+    </label>
+    <button class="btn btn-outline" onclick="toggleAll(true)">📖 全部展开</button>
+    <button class="btn btn-outline" onclick="toggleAll(false)">📕 全部折叠</button>
+    <button class="btn btn-export" onclick="exportData()">📤 导出提取结果</button>
+    <span class="count-label" id="countLabel"></span>
+  </div>
+
+  <!-- Prompt List -->
+  <div class="prompt-list" id="promptList">
+    <div class="no-data">
+      <div class="nd-icon">📋</div>
+      <p>请先导入一个预设 JSON 文件</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  预设提取工具 — 支持 SillyTavern 预设 JSON 格式 · 多选拼接复制
+</div>
+
+<!-- ====== Multi-Select Floating Bar ====== -->
+<div class="select-bar" id="selectBar">
+  <div class="select-bar-inner">
+    <div class="sel-info">
+      📌 已选择 <span class="sel-count" id="selCount">0</span> 条
+      <span class="sel-chars" id="selChars"></span>
+    </div>
+    <div class="sep-selector">
+      <label>拼接分隔:</label>
+      <select id="sepType" onchange="updateSelectBar()">
+        <option value="newline">换行</option>
+        <option value="double-newline" selected>双换行</option>
+        <option value="divider">分割线(---)</option>
+        <option value="none">无分隔</option>
+        <option value="custom">自定义...</option>
+      </select>
+      <input type="text" id="customSep" placeholder="输入分隔符" style="display:none;width:100px;padding:4px 8px;border-radius:4px;border:1px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.1);color:white;font-size:12px;" oninput="updateSelectBar()">
+    </div>
+    <div class="select-bar-actions">
+      <button class="btn-sel btn-preview" onclick="showPreviewModal()">👁 预览</button>
+      <button class="btn-sel btn-copy-all" id="btnCopyAll" onclick="copyAllSelected()">📋 复制拼接文本</button>
+      <button class="btn-sel btn-clear-sel" onclick="clearSelection()">✕ 清除</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== Preview Modal ====== -->
+<div class="modal-overlay" id="previewModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>📑 拼接预览</h3>
+      <button class="modal-close" onclick="closePreviewModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="selected-list" id="modalSelectedList"></div>
+      <div class="combined-text" id="modalCombinedText"></div>
+    </div>
+    <div class="modal-footer">
+      <span class="char-info" id="modalCharInfo"></span>
+      <button class="btn btn-outline" onclick="closePreviewModal()">关闭</button>
+      <button class="btn btn-primary" id="modalCopyBtn" onclick="copyFromModal()">📋 复制全部</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ====== Global State ======
+let presetData = null;
+let orderedPrompts = [];
+let filteredPrompts = [];
+
+// Multi-select state: stores global indices (position in orderedPrompts)
+let selectedSet = new Set();
+
+// ====== File Import ======
+const fileInput = document.getElementById('fileInput');
+const importArea = document.getElementById('importArea');
+
+fileInput.addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (file) loadFile(file);
+});
+
+importArea.addEventListener('dragover', e => {
+  e.preventDefault();
+  importArea.classList.add('drag-over');
+});
+importArea.addEventListener('dragleave', () => importArea.classList.remove('drag-over'));
+importArea.addEventListener('drop', e => {
+  e.preventDefault();
+  importArea.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) loadFile(file);
+});
+
+function loadFile(file) {
+  if (!file.name.endsWith('.json')) {
+    alert('请选择 .json 文件');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      presetData = JSON.parse(e.target.result);
+      selectedSet.clear();
+      processPreset(file.name);
+    } catch (err) {
+      alert('JSON 解析失败: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ====== Process Preset ======
+function processPreset(fileName) {
+  if (!presetData || !presetData.prompts) {
+    alert('未找到 prompts 数组，该文件可能不是有效的预设文件');
+    return;
+  }
+
+  const promptMap = {};
+  presetData.prompts.forEach(p => {
+    promptMap[p.identifier] = p;
+  });
+
+  orderedPrompts = [];
+  if (presetData.prompt_order && presetData.prompt_order.length > 0) {
+    const orderList = presetData.prompt_order[0].order || [];
+    orderList.forEach(item => {
+      const prompt = promptMap[item.identifier];
+      if (prompt) {
+        orderedPrompts.push({
+          ...prompt,
+          _orderEnabled: item.enabled
+        });
+      }
+    });
+    presetData.prompts.forEach(p => {
+      if (!orderList.find(o => o.identifier === p.identifier)) {
+        orderedPrompts.push({ ...p, _orderEnabled: p.enabled });
+      }
+    });
+  } else {
+    orderedPrompts = presetData.prompts.map(p => ({ ...p, _orderEnabled: p.enabled }));
+  }
+
+  showFileInfo(fileName);
+  showStats();
+  showParams();
+  document.getElementById('controlsBar').style.display = 'flex';
+  document.getElementById('toolbar').style.display = 'flex';
+
+  applyFilters();
+}
+
+// ====== File Info ======
+function showFileInfo(fileName) {
+  const div = document.getElementById('fileInfo');
+  div.style.display = 'block';
+  div.innerHTML = `
+    <div class="stat-card" style="margin-bottom:16px;text-align:left;">
+      <div style="font-size:14px;font-weight:700;">✅ 文件已加载: ${escHtml(fileName)}</div>
+      <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">
+        共 ${presetData.prompts.length} 条提示词定义
+        ${presetData.prompt_order ? ' · 含排序信息' : ''}
+      </div>
+    </div>
+  `;
+}
+
+// ====== Stats ======
+function showStats() {
+  const total = orderedPrompts.length;
+  const enabled = orderedPrompts.filter(p => p._orderEnabled).length;
+  const system = orderedPrompts.filter(p => p.role === 'system').length;
+  const user = orderedPrompts.filter(p => p.role === 'user').length;
+  const markers = orderedPrompts.filter(p => p.marker).length;
+
+  document.getElementById('statsBar').style.display = 'flex';
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stat-card"><div class="num">${total}</div><div class="desc">总提示词</div></div>
+    <div class="stat-card"><div class="num" style="color:var(--enabled)">${enabled}</div><div class="desc">已启用</div></div>
+    <div class="stat-card"><div class="num" style="color:var(--disabled)">${total - enabled}</div><div class="desc">已禁用</div></div>
+    <div class="stat-card"><div class="num" style="color:var(--system)">${system}</div><div class="desc">System</div></div>
+    <div class="stat-card"><div class="num" style="color:var(--user)">${user}</div><div class="desc">User</div></div>
+    <div class="stat-card"><div class="num" style="color:var(--marker)">${markers}</div><div class="desc">Marker</div></div>
+  `;
+}
+
+// ====== Model Params ======
+function showParams() {
+  const keys = [
+    'temperature', 'top_p', 'top_k', 'top_a', 'min_p',
+    'frequency_penalty', 'presence_penalty', 'repetition_penalty',
+    'openai_max_context', 'openai_max_tokens',
+    'names_behavior', 'stream_openai', 'reasoning_effort'
+  ];
+  const section = document.getElementById('paramsSection');
+  let hasAny = false;
+  let html = '<h3>⚙️ 模型参数</h3><div class="params-grid">';
+  keys.forEach(k => {
+    if (presetData[k] !== undefined) {
+      hasAny = true;
+      html += `<div class="param-item"><span class="key">${k}</span><span class="val">${presetData[k]}</span></div>`;
+    }
+  });
+  html += '</div>';
+  if (hasAny) {
+    section.style.display = 'block';
+    section.innerHTML = html;
+  }
+}
+
+// ====== Filters ======
+document.getElementById('filterStatus').addEventListener('change', applyFilters);
+document.getElementById('filterRole').addEventListener('change', applyFilters);
+document.getElementById('filterType').addEventListener('change', applyFilters);
+document.getElementById('searchInput').addEventListener('input', applyFilters);
+
+function applyFilters() {
+  const status = document.getElementById('filterStatus').value;
+  const role = document.getElementById('filterRole').value;
+  const type = document.getElementById('filterType').value;
+  const search = document.getElementById('searchInput').value.trim().toLowerCase();
+
+  filteredPrompts = orderedPrompts.filter(p => {
+    if (status === 'enabled' && !p._orderEnabled) return false;
+    if (status === 'disabled' && p._orderEnabled) return false;
+    if (role !== 'all' && p.role !== role) return false;
+    if (type === 'marker' && !p.marker) return false;
+    if (type === 'normal' && p.marker) return false;
+    if (search) {
+      const nameMatch = (p.name || '').toLowerCase().includes(search);
+      const contentMatch = (p.content || '').toLowerCase().includes(search);
+      const idMatch = (p.identifier || '').toLowerCase().includes(search);
+      if (!nameMatch && !contentMatch && !idMatch) return false;
+    }
+    return true;
+  });
+
+  renderPrompts();
+  updateSelectAllCheckbox();
+}
+
+// ====== Render ======
+function renderPrompts() {
+  const list = document.getElementById('promptList');
+  const countLabel = document.getElementById('countLabel');
+  countLabel.textContent = `显示 ${filteredPrompts.length} / ${orderedPrompts.length} 条`;
+
+  if (filteredPrompts.length === 0) {
+    list.innerHTML = '<div class="no-data"><div class="nd-icon">🔍</div><p>没有匹配的提示词</p></div>';
+    return;
+  }
+
+  let html = '';
+  filteredPrompts.forEach((p, idx) => {
+    const globalIdx = orderedPrompts.indexOf(p);
+    const displayIdx = globalIdx + 1;
+    const isEnabled = p._orderEnabled;
+    const isMarker = p.marker;
+    const roleClass = `tag-role-${p.role || 'system'}`;
+    const statusClass = isEnabled ? 'enabled' : 'disabled';
+    const isSelected = selectedSet.has(globalIdx);
+    const cardClasses = [statusClass, isMarker ? 'is-marker' : '', isSelected ? 'selected' : ''].filter(Boolean).join(' ');
+
+    const content = p.content || (isMarker ? '[标记位 - 无内容]' : '[空内容]');
+
+    let injectionInfo = '';
+    if (p.injection_position !== undefined) {
+      const posLabel = p.injection_position === 0 ? '对话前' : (p.injection_position === 1 ? '对话后' : `位置${p.injection_position}`);
+      injectionInfo = `<span class="tag tag-injection">注入:${posLabel} 深度:${p.injection_depth ?? '-'} 顺序:${p.injection_order ?? '-'}</span>`;
+    }
+
+    html += `
+      <div class="prompt-card ${cardClasses}" data-global-idx="${globalIdx}" data-filtered-idx="${idx}">
+        <div class="prompt-header">
+          <div class="prompt-checkbox ${isSelected ? 'checked' : ''}" onclick="toggleSelect(${globalIdx}, event)" title="选择此条拼接">
+            ${isSelected ? '' : ''}
+          </div>
+          <div class="prompt-index" onclick="toggleCard(this.parentElement)">${displayIdx}</div>
+          <div class="prompt-info" onclick="toggleCard(this.parentElement)">
+            <div class="prompt-name">${escHtml(p.name || p.identifier)}</div>
+            <div class="prompt-meta">
+              <span class="tag ${roleClass}">${p.role || 'system'}</span>
+              <span class="tag ${isEnabled ? 'tag-enabled' : 'tag-disabled'}">${isEnabled ? '已启用' : '已禁用'}</span>
+              ${isMarker ? '<span class="tag tag-marker">Marker</span>' : ''}
+              ${p.system_prompt ? '<span class="tag tag-sys-prompt">系统提示</span>' : ''}
+              ${injectionInfo}
+            </div>
+          </div>
+          <div class="prompt-toggle" onclick="toggleCard(this.parentElement)">▼</div>
+        </div>
+        <div class="prompt-body">
+          <div class="prompt-detail-grid">
+            <div class="detail-item"><span class="dk">标识符:</span> <span class="dv" style="font-size:11px;word-break:break-all;">${escHtml(p.identifier)}</span></div>
+            <div class="detail-item"><span class="dk">角色:</span> <span class="dv">${p.role || 'system'}</span></div>
+            <div class="detail-item"><span class="dk">系统提示:</span> <span class="dv">${p.system_prompt ? '是' : '否'}</span></div>
+            <div class="detail-item"><span class="dk">标记位:</span> <span class="dv">${p.marker ? '是' : '否'}</span></div>
+            ${p.injection_position !== undefined ? `
+              <div class="detail-item"><span class="dk">注入位置:</span> <span class="dv">${p.injection_position}</span></div>
+              <div class="detail-item"><span class="dk">注入深度:</span> <span class="dv">${p.injection_depth ?? '-'}</span></div>
+              <div class="detail-item"><span class="dk">注入顺序:</span> <span class="dv">${p.injection_order ?? '-'}</span></div>
+            ` : ''}
+            <div class="detail-item"><span class="dk">禁止覆盖:</span> <span class="dv">${p.forbid_overrides ? '是' : '否'}</span></div>
+          </div>
+          <div class="prompt-content-wrapper">
+            <div class="prompt-content-label">
+              提示词内容 (${content.length} 字符)
+              <button class="copy-btn" onclick="copyContent(this, ${idx})">复制</button>
+            </div>
+            <div class="prompt-content">${escHtml(content)}</div>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  list.innerHTML = html;
+}
+
+// ====== Card Toggle ======
+function toggleCard(header) {
+  header.closest('.prompt-card').classList.toggle('open');
+}
+
+function toggleAll(open) {
+  document.querySelectorAll('.prompt-card').forEach(card => {
+    if (open) card.classList.add('open');
+    else card.classList.remove('open');
+  });
+}
+
+// ====== Multi-Select ======
+function toggleSelect(globalIdx, event) {
+  event.stopPropagation();
+  if (selectedSet.has(globalIdx)) {
+    selectedSet.delete(globalIdx);
+  } else {
+    selectedSet.add(globalIdx);
+  }
+  // Update card UI
+  const card = document.querySelector(`.prompt-card[data-global-idx="${globalIdx}"]`);
+  if (card) {
+    const cb = card.querySelector('.prompt-checkbox');
+    if (selectedSet.has(globalIdx)) {
+      card.classList.add('selected');
+      cb.classList.add('checked');
+    } else {
+      card.classList.remove('selected');
+      cb.classList.remove('checked');
+    }
+  }
+  updateSelectBar();
+  updateSelectAllCheckbox();
+}
+
+function toggleSelectAll(checked) {
+  filteredPrompts.forEach(p => {
+    const globalIdx = orderedPrompts.indexOf(p);
+    if (checked) {
+      selectedSet.add(globalIdx);
+    } else {
+      selectedSet.delete(globalIdx);
+    }
+  });
+  // Update all visible cards
+  document.querySelectorAll('.prompt-card').forEach(card => {
+    const gIdx = parseInt(card.dataset.globalIdx);
+    const cb = card.querySelector('.prompt-checkbox');
+    if (selectedSet.has(gIdx)) {
+      card.classList.add('selected');
+      cb.classList.add('checked');
+    } else {
+      card.classList.remove('selected');
+      cb.classList.remove('checked');
+    }
+  });
+  updateSelectBar();
+}
+
+function updateSelectAllCheckbox() {
+  const cb = document.getElementById('selectAllCb');
+  if (!cb) return;
+  if (filteredPrompts.length === 0) {
+    cb.checked = false;
+    cb.indeterminate = false;
+    return;
+  }
+  const allVisible = filteredPrompts.map(p => orderedPrompts.indexOf(p));
+  const selectedVisible = allVisible.filter(i => selectedSet.has(i));
+  if (selectedVisible.length === 0) {
+    cb.checked = false;
+    cb.indeterminate = false;
+  } else if (selectedVisible.length === allVisible.length) {
+    cb.checked = true;
+    cb.indeterminate = false;
+  } else {
+    cb.checked = false;
+    cb.indeterminate = true;
+  }
+}
+
+function clearSelection() {
+  selectedSet.clear();
+  document.querySelectorAll('.prompt-card').forEach(card => {
+    card.classList.remove('selected');
+    card.querySelector('.prompt-checkbox')?.classList.remove('checked');
+  });
+  updateSelectBar();
+  updateSelectAllCheckbox();
+}
+
+// ====== Separator ======
+document.getElementById('sepType').addEventListener('change', function() {
+  document.getElementById('customSep').style.display = this.value === 'custom' ? 'inline-block' : 'none';
+});
+
+function getSeparator() {
+  const type = document.getElementById('sepType').value;
+  switch (type) {
+    case 'newline': return '\n';
+    case 'double-newline': return '\n\n';
+    case 'divider': return '\n\n---\n\n';
+    case 'none': return '';
+    case 'custom': return document.getElementById('customSep').value || '';
+    default: return '\n\n';
+  }
+}
+
+// ====== Build Combined Text ======
+function getCombinedText() {
+  // Sort selected by their order in orderedPrompts (global index)
+  const sortedIndices = Array.from(selectedSet).sort((a, b) => a - b);
+  const sep = getSeparator();
+  const texts = sortedIndices
+    .map(i => orderedPrompts[i]?.content || '')
+    .filter(t => t.length > 0);
+  return texts.join(sep);
+}
+
+function getSelectedInfo() {
+  const sortedIndices = Array.from(selectedSet).sort((a, b) => a - b);
+  return sortedIndices.map(i => ({
+    index: i,
+    name: orderedPrompts[i]?.name || orderedPrompts[i]?.identifier || `#${i + 1}`
+  }));
+}
+
+// ====== Select Bar ======
+function updateSelectBar() {
+  const bar = document.getElementById('selectBar');
+  const count = selectedSet.size;
+  document.getElementById('selCount').textContent = count;
+
+  if (count > 0) {
+    bar.classList.add('visible');
+    const combined = getCombinedText();
+    document.getElementById('selChars').textContent = `· ${combined.length} 字符`;
+  } else {
+    bar.classList.remove('visible');
+  }
+}
+
+// ====== Copy All Selected ======
+function copyAllSelected() {
+  const combined = getCombinedText();
+  if (!combined) return;
+  const btn = document.getElementById('btnCopyAll');
+  doCopy(combined, btn, '📋 复制拼接文本');
+}
+
+function copyFromModal() {
+  const combined = getCombinedText();
+  if (!combined) return;
+  const btn = document.getElementById('modalCopyBtn');
+  doCopy(combined, btn, '📋 复制全部');
+}
+
+function doCopy(text, btn, originalLabel) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✅ 已复制!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = originalLabel;
+      btn.classList.remove('copied');
+    }, 2000);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = '✅ 已复制!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = originalLabel; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ====== Preview Modal ======
+function showPreviewModal() {
+  const modal = document.getElementById('previewModal');
+  const listEl = document.getElementById('modalSelectedList');
+  const textEl = document.getElementById('modalCombinedText');
+  const charInfo = document.getElementById('modalCharInfo');
+
+  const info = getSelectedInfo();
+  const combined = getCombinedText();
+
+  // Render chips
+  listEl.innerHTML = info.map((item, i) => `
+    <span class="selected-chip">
+      <span class="chip-num">${i + 1}</span>
+      ${escHtml(item.name)}
+    </span>
+  `).join('');
+
+  textEl.textContent = combined;
+  charInfo.textContent = `共 ${info.length} 条 · ${combined.length} 字符`;
+
+  modal.classList.add('visible');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePreviewModal() {
+  document.getElementById('previewModal').classList.remove('visible');
+  document.body.style.overflow = '';
+}
+
+// Close modal on overlay click
+document.getElementById('previewModal').addEventListener('click', function(e) {
+  if (e.target === this) closePreviewModal();
+});
+
+// Close modal on Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closePreviewModal();
+});
+
+// ====== Copy Single ======
+function copyContent(btn, idx) {
+  const content = filteredPrompts[idx].content || '';
+  navigator.clipboard.writeText(content).then(() => {
+    btn.textContent = '已复制!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = '复制';
+      btn.classList.remove('copied');
+    }, 1500);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = content;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = '已复制!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '复制'; btn.classList.remove('copied'); }, 1500);
+  });
+}
+
+// ====== Export ======
+function exportData() {
+  if (!orderedPrompts.length) return;
+
+  const lines = [];
+  lines.push('# 预设提取结果\n');
+  lines.push(`生成时间: ${new Date().toLocaleString('zh-CN')}`);
+  lines.push(`总提示词数: ${orderedPrompts.length}`);
+  lines.push(`已启用: ${orderedPrompts.filter(p => p._orderEnabled).length}`);
+  lines.push('');
+  lines.push('---\n');
+
+  orderedPrompts.forEach((p, i) => {
+    lines.push(`## ${i + 1}. ${p.name || p.identifier}`);
+    lines.push('');
+    lines.push(`- **标识符**: ${p.identifier}`);
+    lines.push(`- **角色**: ${p.role || 'system'}`);
+    lines.push(`- **状态**: ${p._orderEnabled ? '✅ 已启用' : '❌ 已禁用'}`);
+    lines.push(`- **系统提示**: ${p.system_prompt ? '是' : '否'}`);
+    lines.push(`- **标记位**: ${p.marker ? '是' : '否'}`);
+    if (p.injection_position !== undefined) {
+      lines.push(`- **注入位置**: ${p.injection_position} | 深度: ${p.injection_depth ?? '-'} | 顺序: ${p.injection_order ?? '-'}`);
+    }
+    lines.push('');
+    if (p.content) {
+      lines.push('**提示词内容:**');
+      lines.push('```');
+      lines.push(p.content);
+      lines.push('```');
+    } else if (p.marker) {
+      lines.push('*[标记位 - 无内容]*');
+    }
+    lines.push('');
+    lines.push('---\n');
+  });
+
+  const blob = new Blob([lines.join('\n')], { type: 'text/markdown;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `preset_extract_${Date.now()}.md`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ====== Utility ======
+function escHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+</script>
+
+</body>
+</html>
