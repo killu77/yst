@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>预设提取工具 v3</title>
+<title>预设提取工具 v5</title>
 <style>
   :root {
     --bg: #f8f9fa;
@@ -36,10 +36,9 @@
     color: white; padding: 30px 20px; text-align: center;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   }
-  .header h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; letter-spacing: 1px; }
+  .header h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
   .header p { opacity: 0.8; font-size: 14px; }
   .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
-
   .import-area {
     background: var(--card-bg); border: 2px dashed var(--border); border-radius: 12px;
     padding: 40px 20px; text-align: center; margin-bottom: 20px;
@@ -53,7 +52,6 @@
     display: inline-block; background: var(--accent); color: white;
     padding: 10px 28px; border-radius: 8px; font-size: 14px; font-weight: 600; pointer-events: none;
   }
-
   .stats-bar { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
   .stat-card {
     flex: 1; min-width: 100px; background: var(--card-bg); border-radius: 10px;
@@ -61,7 +59,6 @@
   }
   .stat-card .num { font-size: 28px; font-weight: 700; color: var(--accent); }
   .stat-card .desc { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
-
   .controls {
     background: var(--card-bg); border-radius: 10px; padding: 16px 20px;
     margin-bottom: 20px; box-shadow: var(--shadow);
@@ -74,7 +71,6 @@
   }
   .controls select:focus, .controls input:focus { border-color: var(--accent); }
   .controls input[type="text"] { flex: 1; min-width: 180px; }
-
   .btn {
     padding: 8px 18px; border: none; border-radius: 6px;
     font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s;
@@ -85,32 +81,27 @@
   .btn-outline:hover { background: var(--bg); }
   .btn-export { background: #27ae60; color: white; }
   .btn-export:hover { background: #219a52; }
-
-  /* Order selector panel */
   .order-panel {
     background: var(--card-bg); border-radius: 10px; padding: 16px 20px;
     margin-bottom: 20px; box-shadow: var(--shadow);
     display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
   }
-  .order-panel .op-label { font-size: 14px; font-weight: 700; color: var(--text); }
+  .order-panel .op-label { font-size: 14px; font-weight: 700; }
   .order-panel select {
     padding: 8px 14px; border: 1px solid var(--border); border-radius: 6px;
-    font-size: 13px; background: white; color: var(--text); outline: none; min-width: 260px;
+    font-size: 13px; background: white; outline: none; min-width: 280px;
   }
-  .order-panel select:focus { border-color: var(--accent); }
   .order-panel .op-hint { font-size: 11px; color: var(--text-secondary); }
   .order-badge {
     display: inline-block; padding: 2px 8px; border-radius: 4px;
     font-size: 11px; font-weight: 600; background: rgba(39,174,96,0.12); color: var(--enabled);
   }
-
-  /* Params */
   .params-section {
     background: var(--card-bg); border-radius: 10px; padding: 18px 20px;
     margin-bottom: 20px; box-shadow: var(--shadow);
   }
   .params-section h3 {
-    font-size: 15px; margin-bottom: 12px; color: var(--text);
+    font-size: 15px; margin-bottom: 12px;
     border-bottom: 1px solid var(--border); padding-bottom: 8px;
   }
   .params-grid {
@@ -122,8 +113,6 @@
   }
   .param-item .key { color: var(--text-secondary); }
   .param-item .val { font-weight: 600; font-family: "Courier New", monospace; }
-
-  /* Prompt Card */
   .prompt-list { display: flex; flex-direction: column; gap: 12px; }
   .prompt-card {
     background: var(--card-bg); border-radius: 10px; box-shadow: var(--shadow);
@@ -133,9 +122,7 @@
   .prompt-card.enabled { border-left-color: var(--enabled); }
   .prompt-card.disabled { border-left-color: var(--disabled); opacity: 0.7; }
   .prompt-card.is-marker { border-left-color: var(--marker); }
-  .prompt-card.is-builtin-slot {
-    border-left-color: var(--slot-border); background: var(--slot-bg); opacity: 0.85;
-  }
+  .prompt-card.is-builtin { border-left-color: var(--slot-border); background: var(--slot-bg); }
   .prompt-card.selected {
     border-left-color: var(--selected-border) !important;
     background: var(--selected-bg);
@@ -161,7 +148,7 @@
     border-radius: 50%; flex-shrink: 0;
   }
   .prompt-card.enabled .prompt-index { background: var(--enabled); }
-  .prompt-card.is-builtin-slot .prompt-index { background: var(--marker); }
+  .prompt-card.is-builtin .prompt-index { background: var(--marker); }
   .prompt-info { flex: 1; min-width: 0; }
   .prompt-name {
     font-size: 15px; font-weight: 600; white-space: nowrap;
@@ -213,13 +200,11 @@
   .detail-item { font-size: 12px; padding: 4px 8px; background: var(--bg); border-radius: 4px; }
   .detail-item .dk { color: var(--text-secondary); }
   .detail-item .dv { font-weight: 600; }
-
   .no-data {
     text-align: center; padding: 60px 20px; color: var(--text-secondary); font-size: 15px;
   }
   .no-data .nd-icon { font-size: 64px; margin-bottom: 10px; opacity: 0.5; }
   .footer { text-align: center; padding: 30px 20px; font-size: 12px; color: var(--text-secondary); }
-
   .toolbar {
     display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center;
   }
@@ -230,8 +215,20 @@
   }
   .select-all-wrap:hover { color: var(--text); }
   .select-all-cb { width: 18px; height: 18px; cursor: pointer; accent-color: var(--accent); }
-
-  /* Select Bar */
+  .orphan-section { margin-top: 24px; }
+  .orphan-header {
+    background: #fdf2f2; border: 1px solid #e8b4b4; border-radius: 10px;
+    padding: 12px 18px; display: flex; align-items: center; gap: 10px;
+    cursor: pointer; user-select: none; font-size: 14px; font-weight: 600; color: #c0392b;
+  }
+  .orphan-header:hover { background: #fbe9e9; }
+  .orphan-header .ot { transition: transform 0.3s; font-size: 16px; margin-left: auto; }
+  .orphan-section.open .orphan-header .ot { transform: rotate(180deg); }
+  .orphan-hint { font-size: 11px; font-weight: 400; color: var(--text-secondary); }
+  .orphan-body { display: none; padding-top: 12px; }
+  .orphan-section.open .orphan-body { display: flex; flex-direction: column; gap: 12px; }
+  .orphan-body .prompt-card { opacity: 0.6; }
+  .orphan-body .prompt-card:hover { opacity: 0.85; }
   .select-bar {
     position: fixed; bottom: 0; left: 0; right: 0;
     background: linear-gradient(135deg, #2c3e50, #34495e); color: white;
@@ -243,14 +240,14 @@
     max-width: 1100px; margin: 0 auto; padding: 14px 20px;
     display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
   }
-  .select-bar .sel-info { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-  .select-bar .sel-count {
+  .sel-info { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .sel-count {
     background: var(--accent); color: white; padding: 2px 10px;
     border-radius: 12px; font-size: 13px; font-weight: 700;
   }
-  .select-bar .sel-chars { font-size: 12px; opacity: 0.7; }
+  .sel-chars { font-size: 12px; opacity: 0.7; }
   .select-bar-actions { display: flex; gap: 8px; margin-left: auto; align-items: center; }
-  .select-bar .btn-sel {
+  .btn-sel {
     padding: 8px 18px; border: none; border-radius: 6px;
     font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s;
   }
@@ -271,8 +268,6 @@
     background: rgba(255,255,255,0.1); color: white; font-size: 12px; outline: none;
   }
   .sep-selector select option { color: #333; background: white; }
-
-  /* Modal */
   .modal-overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000;
     display: none; align-items: center; justify-content: center;
@@ -294,25 +289,25 @@
     border-bottom: 1px solid var(--border); gap: 12px;
   }
   .modal-header h3 { flex: 1; font-size: 17px; }
-  .modal-header .modal-close {
+  .modal-close {
     width: 32px; height: 32px; border: none; background: var(--bg);
     border-radius: 50%; font-size: 18px; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     transition: 0.2s; color: var(--text-secondary);
   }
-  .modal-header .modal-close:hover { background: #eee; color: var(--text); }
+  .modal-close:hover { background: #eee; color: var(--text); }
   .modal-body { flex: 1; overflow-y: auto; padding: 20px 24px; }
-  .modal-body .selected-list { margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 6px; }
-  .modal-body .selected-chip {
+  .selected-list { margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .selected-chip {
     display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px;
     background: rgba(52,152,219,0.1); color: var(--accent);
     border-radius: 16px; font-size: 12px; font-weight: 600;
   }
-  .selected-chip .chip-num {
+  .chip-num {
     background: var(--accent); color: white; width: 18px; height: 18px;
     border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px;
   }
-  .modal-body .combined-text {
+  .combined-text {
     background: #f5f6f8; border: 1px solid var(--border); border-radius: 8px;
     padding: 16px 18px; font-size: 13px; line-height: 1.8; white-space: pre-wrap;
     word-break: break-word; font-family: "Courier New", "Noto Sans SC", monospace;
@@ -323,12 +318,10 @@
     display: flex; gap: 8px; justify-content: flex-end; align-items: center;
   }
   .modal-footer .char-info { margin-right: auto; font-size: 12px; color: var(--text-secondary); }
-
   @media (max-width: 600px) {
     .header h1 { font-size: 22px; }
     .controls { flex-direction: column; }
     .stat-card { min-width: 80px; }
-    .prompt-name { font-size: 14px; }
     .order-panel { flex-direction: column; }
     .order-panel select { min-width: auto; width: 100%; }
   }
@@ -337,8 +330,8 @@
 <body>
 
 <div class="header">
-  <h1>📜 预设提取工具 v3</h1>
-  <p>导入 SillyTavern 预设 JSON · 与酒馆 Prompt Manager 顺序完全一致</p>
+  <h1>📜 预设提取工具 v5</h1>
+  <p>导入 SillyTavern 预设 JSON · 严格按 prompt_order 排列 · 与酒馆完全一致</p>
 </div>
 
 <div class="container">
@@ -353,14 +346,12 @@
   <div class="stats-bar" id="statsBar" style="display:none"></div>
   <div class="params-section" id="paramsSection" style="display:none"></div>
 
-  <!-- Order Selector -->
   <div class="order-panel" id="orderPanel" style="display:none">
     <span class="op-label">📐 排序方案:</span>
     <select id="orderSelect" onchange="onOrderChange()"></select>
     <span class="op-hint" id="orderHint"></span>
   </div>
 
-  <!-- Controls -->
   <div class="controls" id="controlsBar" style="display:none">
     <label>筛选:</label>
     <select id="filterStatus">
@@ -377,9 +368,8 @@
     <input type="text" id="searchInput" placeholder="🔍 搜索名称或内容...">
   </div>
 
-  <!-- Toolbar -->
   <div class="toolbar" id="toolbar" style="display:none">
-    <label class="select-all-wrap" title="全选/取消全选">
+    <label class="select-all-wrap">
       <input type="checkbox" class="select-all-cb" id="selectAllCb" onchange="toggleSelectAll(this.checked)">
       全选
     </label>
@@ -390,22 +380,15 @@
   </div>
 
   <div class="prompt-list" id="promptList">
-    <div class="no-data">
-      <div class="nd-icon">📋</div>
-      <p>请先导入一个预设 JSON 文件</p>
-    </div>
+    <div class="no-data"><div class="nd-icon">📋</div><p>请先导入一个预设 JSON 文件</p></div>
   </div>
 </div>
 
-<div class="footer">预设提取工具 v3 — 与 SillyTavern Prompt Manager 顺序一致</div>
+<div class="footer">预设提取工具 v5 — 严格按 prompt_order 数组排列</div>
 
-<!-- Select Bar -->
 <div class="select-bar" id="selectBar">
   <div class="select-bar-inner">
-    <div class="sel-info">
-      📌 已选择 <span class="sel-count" id="selCount">0</span> 条
-      <span class="sel-chars" id="selChars"></span>
-    </div>
+    <div class="sel-info">📌 已选择 <span class="sel-count" id="selCount">0</span> 条 <span class="sel-chars" id="selChars"></span></div>
     <div class="sep-selector">
       <label>分隔:</label>
       <select id="sepType" onchange="onSepChange()">
@@ -427,7 +410,6 @@
   </div>
 </div>
 
-<!-- Preview Modal -->
 <div class="modal-overlay" id="previewModal">
   <div class="modal">
     <div class="modal-header">
@@ -447,83 +429,66 @@
 </div>
 
 <script>
-// =====================================================================
-//  State
-// =====================================================================
 let presetData = null;
-let orderedPrompts = [];   // current ordered list
-let filteredPrompts = [];  // after filter
-let selectedOrderIdx = -1; // which prompt_order entry
-let selectedSet = new Set(); // uid set
+let orderedPrompts = [];   // 严格按 prompt_order 排列，不多不少
+let orphanPrompts = [];    // 不在 prompt_order 中的条目
+let filteredPrompts = [];
+let selectedOrderIdx = -1;
+let selectedSet = new Set();
 
-// Prompt names for built-in identifiers (shown in SillyTavern with ♟/☰/⭐ icons)
-const BUILTIN_META = {
-  main:              { icon: '⭐', label: 'Main Prompt' },
-  nsfw:              { icon: '⭐', label: 'NSFW Prompt' },
-  jailbreak:         { icon: '⭐', label: 'Jailbreak' },
-  worldInfoBefore:   { icon: '♟', label: 'World Info (before)' },
-  worldInfoAfter:    { icon: '♟', label: 'World Info (after)' },
-  charDescription:   { icon: '♟', label: 'Char Description' },
-  charPersonality:   { icon: '♟', label: 'Char Personality' },
-  scenario:          { icon: '♟', label: 'Scenario' },
-  personaDescription:{ icon: '♟', label: 'Persona Description' },
-  enhanceDefinitions:{ icon: '☰', label: 'Enhance Definitions' },
-  dialogueExamples:  { icon: '♟', label: 'Chat Examples' },
-  chatHistory:       { icon: '♟', label: 'Chat History' },
+// 酒馆内置标识符的图标映射
+const ICONS = {
+  main:'⭐', nsfw:'⭐', jailbreak:'★',
+  worldInfoBefore:'♟', worldInfoAfter:'♟',
+  charDescription:'♟', charPersonality:'♟',
+  scenario:'♟', personaDescription:'♟',
+  enhanceDefinitions:'▤',
+  dialogueExamples:'♟', chatHistory:'♟',
 };
 
 // =====================================================================
-//  File Import
+//  导入
 // =====================================================================
 const fileInput = document.getElementById('fileInput');
 const importArea = document.getElementById('importArea');
-fileInput.addEventListener('change', e => { if (e.target.files[0]) loadFile(e.target.files[0]); });
+fileInput.addEventListener('change', e => { if(e.target.files[0]) loadFile(e.target.files[0]); });
 importArea.addEventListener('dragover', e => { e.preventDefault(); importArea.classList.add('drag-over'); });
 importArea.addEventListener('dragleave', () => importArea.classList.remove('drag-over'));
 importArea.addEventListener('drop', e => {
   e.preventDefault(); importArea.classList.remove('drag-over');
-  if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
+  if(e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
 });
 
 function loadFile(file) {
-  if (!file.name.endsWith('.json')) { alert('请选择 .json 文件'); return; }
-  const reader = new FileReader();
-  reader.onload = e => {
+  if(!file.name.endsWith('.json')){ alert('请选择 .json 文件'); return; }
+  const r = new FileReader();
+  r.onload = e => {
     try {
       presetData = JSON.parse(e.target.result);
       selectedSet.clear();
       processPreset(file.name);
-    } catch (err) { alert('JSON 解析失败: ' + err.message); }
+    } catch(err){ alert('JSON 解析失败: '+err.message); }
   };
-  reader.readAsText(file);
+  r.readAsText(file);
 }
 
 // =====================================================================
-//  Process
+//  处理
 // =====================================================================
 function processPreset(fileName) {
-  if (!presetData || !presetData.prompts) {
-    alert('未找到 prompts 数组'); return;
-  }
+  if(!presetData||!presetData.prompts){ alert('未找到 prompts 数组'); return; }
 
-  const orderEntries = presetData.prompt_order || [];
+  const entries = presetData.prompt_order || [];
 
-  // ★ KEY FIX: default to the LAST entry (most entries = most customized)
-  // This matches what SillyTavern actually displays
-  if (orderEntries.length > 0) {
-    // Find the entry with the most items (most customized)
-    let bestIdx = orderEntries.length - 1;
-    let bestLen = 0;
-    orderEntries.forEach((entry, i) => {
-      const len = (entry.order || []).length;
-      if (len > bestLen) { bestLen = len; bestIdx = i; }
-    });
-    selectedOrderIdx = bestIdx;
-  } else {
-    selectedOrderIdx = 0;
-  }
+  // 自动选条目最多的方案
+  selectedOrderIdx = 0;
+  let bestLen = 0;
+  entries.forEach((e,i) => {
+    const len = (e.order||[]).length;
+    if(len > bestLen){ bestLen = len; selectedOrderIdx = i; }
+  });
 
-  setupOrderSelector(orderEntries);
+  setupOrderSelector(entries);
   rebuildOrder();
   showFileInfo(fileName);
   showStats();
@@ -535,51 +500,45 @@ function processPreset(fileName) {
 
 function setupOrderSelector(entries) {
   const panel = document.getElementById('orderPanel');
-  const select = document.getElementById('orderSelect');
-
-  if (entries.length <= 1) {
-    panel.style.display = 'none';
-    return;
-  }
-
+  const sel = document.getElementById('orderSelect');
+  if(entries.length <= 1){ panel.style.display = 'none'; return; }
   panel.style.display = 'flex';
-  select.innerHTML = entries.map((entry, i) => {
-    const count = (entry.order || []).length;
-    const cid = entry.character_id;
-    const label = `方案 ${i + 1}: character_id=${cid} (${count} 条)`;
-    const sel = i === selectedOrderIdx ? 'selected' : '';
-    return `<option value="${i}" ${sel}>${label}</option>`;
+  sel.innerHTML = entries.map((e,i) => {
+    const n = (e.order||[]).length;
+    return `<option value="${i}" ${i===selectedOrderIdx?'selected':''}>方案${i+1}: character_id=${e.character_id} (${n}条)</option>`;
   }).join('');
+  updateOrderHint(entries);
+}
 
+function updateOrderHint(entries) {
+  const e = entries[selectedOrderIdx];
   document.getElementById('orderHint').innerHTML =
-    `共 ${entries.length} 套排序方案，已自动选择条目最多的一套` +
-    ` <span class="order-badge">当前: 方案 ${selectedOrderIdx + 1}</span>`;
+    `共${entries.length}套 <span class="order-badge">当前: 方案${selectedOrderIdx+1} (${(e?.order||[]).length}条)</span>`;
 }
 
 function onOrderChange() {
-  selectedOrderIdx = parseInt(document.getElementById('orderSelect').value) || 0;
+  selectedOrderIdx = parseInt(document.getElementById('orderSelect').value)||0;
   selectedSet.clear();
   rebuildOrder();
   applyFilters();
   updateSelectBar();
-
-  const entries = presetData.prompt_order || [];
-  document.getElementById('orderHint').innerHTML =
-    `共 ${entries.length} 套排序方案` +
-    ` <span class="order-badge">当前: 方案 ${selectedOrderIdx + 1}</span>`;
+  updateOrderHint(presetData.prompt_order||[]);
 }
 
 // =====================================================================
-//  Build ordered list from selected prompt_order entry
+//  ★ 核心：严格按 prompt_order 数组构建列表
 // =====================================================================
 function rebuildOrder() {
+  // 1. 建立 prompts 数组的查找表
   const promptMap = {};
   presetData.prompts.forEach(p => { promptMap[p.identifier] = p; });
 
+  // 2. 取当前选中的 prompt_order 条目
   const entries = presetData.prompt_order || [];
   const entry = entries[selectedOrderIdx] || entries[0];
   const orderList = entry ? (entry.order || []) : [];
 
+  // 3. 严格按 orderList 的顺序遍历，只收录 orderList 中的条目
   orderedPrompts = [];
   const seen = new Set();
 
@@ -587,437 +546,364 @@ function rebuildOrder() {
     const id = item.identifier;
     seen.add(id);
 
-    if (promptMap[id]) {
-      // Prompt exists in the prompts array
-      const p = promptMap[id];
-      const displayName = p.name || (BUILTIN_META[id] ? BUILTIN_META[id].label : id);
+    const promptData = promptMap[id]; // 在 prompts 数组中查找
+
+    if (promptData) {
+      // prompts 数组中存在该条目
+      const icon = ICONS[id];
       orderedPrompts.push({
-        ...p,
-        _orderEnabled: item.enabled,
-        _isBuiltinSlot: false,
-        _displayName: displayName,
-        _uid: id
-      });
-    } else if (BUILTIN_META[id]) {
-      // Built-in slot not in prompts array (e.g. charDescription as pure marker)
-      orderedPrompts.push({
-        identifier: id,
-        name: BUILTIN_META[id].label,
-        role: 'system',
-        content: '',
-        marker: true,
-        system_prompt: true,
-        _orderEnabled: item.enabled,
-        _isBuiltinSlot: true,
-        _displayName: `${BUILTIN_META[id].icon} ${BUILTIN_META[id].label}`,
+        ...promptData,
+        _enabled: item.enabled,       // 启用状态来自 prompt_order
+        _isBuiltin: !!icon && !promptData.content && promptData.marker,
+        _displayName: icon ? `${icon} ${promptData.name||id}` : `* ${promptData.name||id}`,
         _uid: id
       });
     } else {
-      // Unknown identifier
+      // prompts 数组中不存在，是纯内置插槽（如 personaDescription 等不在 prompts 中时）
+      const icon = ICONS[id] || '♟';
       orderedPrompts.push({
         identifier: id,
         name: id,
         role: 'system',
         content: '',
-        marker: false,
-        system_prompt: false,
-        _orderEnabled: item.enabled,
-        _isBuiltinSlot: true,
-        _displayName: id,
+        marker: true,
+        system_prompt: true,
+        _enabled: item.enabled,
+        _isBuiltin: true,
+        _displayName: `${icon} ${id}`,
         _uid: id
       });
     }
   });
 
-  // Add any prompts not listed in this order entry
+  // 4. 收集不在 prompt_order 中的孤儿条目（酒馆不显示这些）
+  orphanPrompts = [];
   presetData.prompts.forEach(p => {
     if (!seen.has(p.identifier)) {
-      orderedPrompts.push({
+      orphanPrompts.push({
         ...p,
-        _orderEnabled: p.enabled ?? false,
-        _isBuiltinSlot: false,
-        _displayName: p.name || p.identifier,
-        _uid: p.identifier + '__extra'
+        _enabled: false,
+        _isBuiltin: false,
+        _displayName: `* ${p.name||p.identifier}`,
+        _uid: p.identifier + '__orphan'
       });
     }
   });
 }
 
 // =====================================================================
-//  Filters
+//  筛选
 // =====================================================================
 document.getElementById('filterStatus').addEventListener('change', applyFilters);
 document.getElementById('filterRole').addEventListener('change', applyFilters);
 document.getElementById('searchInput').addEventListener('input', applyFilters);
 
+function matchFilter(p) {
+  const st = document.getElementById('filterStatus').value;
+  const rl = document.getElementById('filterRole').value;
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  if(st==='enabled' && !p._enabled) return false;
+  if(st==='disabled' && p._enabled) return false;
+  if(rl!=='all' && p.role!==rl) return false;
+  if(q) {
+    if(!(p.name||'').toLowerCase().includes(q) &&
+       !(p.content||'').toLowerCase().includes(q) &&
+       !(p.identifier||'').toLowerCase().includes(q)) return false;
+  }
+  return true;
+}
+
 function applyFilters() {
-  const status = document.getElementById('filterStatus').value;
-  const role = document.getElementById('filterRole').value;
-  const search = document.getElementById('searchInput').value.trim().toLowerCase();
-
-  filteredPrompts = orderedPrompts.filter(p => {
-    if (status === 'enabled' && !p._orderEnabled) return false;
-    if (status === 'disabled' && p._orderEnabled) return false;
-    if (role !== 'all' && p.role !== role) return false;
-    if (search) {
-      const n = (p.name || '').toLowerCase().includes(search);
-      const c = (p.content || '').toLowerCase().includes(search);
-      const i = (p.identifier || '').toLowerCase().includes(search);
-      if (!n && !c && !i) return false;
-    }
-    return true;
-  });
-
-  renderPrompts();
+  filteredPrompts = orderedPrompts.filter(matchFilter);
+  render();
   updateSelectAllCheckbox();
 }
 
 // =====================================================================
-//  Render
+//  渲染
 // =====================================================================
-function renderPrompts() {
+function render() {
   const list = document.getElementById('promptList');
-  const countLabel = document.getElementById('countLabel');
-  countLabel.textContent = `显示 ${filteredPrompts.length} / ${orderedPrompts.length} 条`;
-
-  if (filteredPrompts.length === 0) {
-    list.innerHTML = '<div class="no-data"><div class="nd-icon">🔍</div><p>没有匹配的提示词</p></div>';
-    return;
-  }
+  document.getElementById('countLabel').textContent = `显示 ${filteredPrompts.length} / ${orderedPrompts.length} 条`;
 
   let html = '';
-  filteredPrompts.forEach((p, idx) => {
-    const globalIdx = orderedPrompts.indexOf(p);
-    const displayIdx = globalIdx + 1;
-    const isEnabled = p._orderEnabled;
-    const isMarker = p.marker;
-    const isBuiltinSlot = p._isBuiltinSlot;
-    const isSelected = selectedSet.has(p._uid);
 
-    let classes = isEnabled ? 'enabled' : 'disabled';
-    if (isMarker && isBuiltinSlot) classes += ' is-builtin-slot';
-    else if (isMarker) classes += ' is-marker';
-    else if (isBuiltinSlot) classes += ' is-builtin-slot';
-    if (isSelected) classes += ' selected';
+  if(filteredPrompts.length === 0) {
+    html = '<div class="no-data"><div class="nd-icon">🔍</div><p>没有匹配的提示词</p></div>';
+  } else {
+    filteredPrompts.forEach(p => {
+      const idx = orderedPrompts.indexOf(p);
+      html += card(p, idx + 1);
+    });
+  }
 
-    const content = p.content || (isMarker ? '[标记位 - 此处插入对应内容]' : (isBuiltinSlot ? '[内置插槽]' : '[空内容]'));
-    const hasContent = p.content && p.content.length > 0;
-    const roleClass = `tag-role-${p.role || 'system'}`;
-
-    // Build display name with icon for builtins
-    let displayName = p._displayName || p.name || p.identifier;
-    const bi = BUILTIN_META[p.identifier];
-    if (bi && !p._isBuiltinSlot) {
-      // Prompt exists in array but is a known builtin
-      displayName = `${bi.icon} ${p.name || bi.label}`;
-    } else if (bi && p._isBuiltinSlot) {
-      displayName = `${bi.icon} ${bi.label}`;
-    } else {
-      displayName = `* ${p.name || p.identifier}`;
-    }
-
-    let injectionInfo = '';
-    if (p.injection_position !== undefined && !isBuiltinSlot) {
-      const posLabel = p.injection_position === 0 ? '对话前' : (p.injection_position === 1 ? '对话内' : `位置${p.injection_position}`);
-      injectionInfo = `<span class="tag tag-injection">注入:${posLabel} 深度:${p.injection_depth ?? '-'}</span>`;
-    }
-
-    let slotTag = '';
-    if (isBuiltinSlot) slotTag = `<span class="tag tag-slot">内置插槽</span>`;
-
+  // 孤儿区
+  if(orphanPrompts.length > 0) {
     html += `
-      <div class="prompt-card ${classes}" data-uid="${escAttr(p._uid)}" data-gidx="${globalIdx}">
-        <div class="prompt-header">
-          <div class="prompt-checkbox ${isSelected ? 'checked' : ''}" onclick="toggleSelect('${escAttr(p._uid)}', event)"></div>
-          <div class="prompt-index">${displayIdx}</div>
-          <div class="prompt-info" onclick="toggleCard(this.parentElement)">
-            <div class="prompt-name">${escHtml(displayName)}</div>
-            <div class="prompt-meta">
-              <span class="tag ${roleClass}">${p.role || 'system'}</span>
-              <span class="tag ${isEnabled ? 'tag-enabled' : 'tag-disabled'}">${isEnabled ? '已启用' : '已禁用'}</span>
-              ${isMarker ? '<span class="tag tag-marker">Marker</span>' : ''}
-              ${slotTag}
-              ${p.system_prompt ? '<span class="tag tag-sys-prompt">系统提示</span>' : ''}
-              ${injectionInfo}
-            </div>
-          </div>
-          <div class="prompt-toggle" onclick="toggleCard(this.parentElement)">▼</div>
+      <div class="orphan-section" id="orphanSec">
+        <div class="orphan-header" onclick="document.getElementById('orphanSec').classList.toggle('open')">
+          ⚠️ 不在当前 prompt_order 中的条目 (${orphanPrompts.length} 条)
+          <span class="orphan-hint">— 酒馆不显示这些</span>
+          <span class="ot">▼</span>
         </div>
-        <div class="prompt-body">
-          <div class="prompt-detail-grid">
-            <div class="detail-item"><span class="dk">标识符:</span> <span class="dv" style="font-size:11px;word-break:break-all;">${escHtml(p.identifier)}</span></div>
-            <div class="detail-item"><span class="dk">角色:</span> <span class="dv">${p.role || 'system'}</span></div>
-            <div class="detail-item"><span class="dk">系统提示:</span> <span class="dv">${p.system_prompt ? '是' : '否'}</span></div>
-            <div class="detail-item"><span class="dk">标记位:</span> <span class="dv">${p.marker ? '是' : '否'}</span></div>
-            ${isBuiltinSlot ? '<div class="detail-item"><span class="dk">类型:</span> <span class="dv">内置插槽</span></div>' : ''}
-            ${p.injection_position !== undefined ? `
-              <div class="detail-item"><span class="dk">注入位置:</span> <span class="dv">${p.injection_position}</span></div>
-              <div class="detail-item"><span class="dk">注入深度:</span> <span class="dv">${p.injection_depth ?? '-'}</span></div>
-              <div class="detail-item"><span class="dk">注入顺序:</span> <span class="dv">${p.injection_order ?? '-'}</span></div>
-            ` : ''}
-          </div>
-          ${hasContent ? `
-          <div class="prompt-content-wrapper">
-            <div class="prompt-content-label">
-              提示词内容 (${p.content.length} 字符)
-              <button class="copy-btn" onclick="copySingle(this, '${escAttr(p._uid)}')">复制</button>
-            </div>
-            <div class="prompt-content">${escHtml(content)}</div>
-          </div>` : `
-          <div class="prompt-content-wrapper">
-            <div class="prompt-content-label">内容</div>
-            <div class="prompt-content" style="color:#999;font-style:italic;">${escHtml(content)}</div>
-          </div>`}
+        <div class="orphan-body">
+          ${orphanPrompts.map((p,i) => card(p,'?')).join('')}
         </div>
-      </div>
-    `;
-  });
+      </div>`;
+  }
 
   list.innerHTML = html;
 }
 
-// =====================================================================
-//  Card / Select
-// =====================================================================
-function toggleCard(header) { header.closest('.prompt-card').classList.toggle('open'); }
-function toggleAll(open) {
-  document.querySelectorAll('.prompt-card').forEach(c => c.classList.toggle('open', open));
-}
+function card(p, num) {
+  const en = p._enabled;
+  const mk = p.marker;
+  const bi = p._isBuiltin;
+  const sel = selectedSet.has(p._uid);
+  let cls = en ? 'enabled' : 'disabled';
+  if(bi) cls += ' is-builtin';
+  else if(mk) cls += ' is-marker';
+  if(sel) cls += ' selected';
 
-function toggleSelect(uid, event) {
-  event.stopPropagation();
-  if (selectedSet.has(uid)) selectedSet.delete(uid);
-  else selectedSet.add(uid);
-  const card = document.querySelector(`.prompt-card[data-uid="${CSS.escape(uid)}"]`);
-  if (card) {
-    const cb = card.querySelector('.prompt-checkbox');
-    card.classList.toggle('selected', selectedSet.has(uid));
-    cb.classList.toggle('checked', selectedSet.has(uid));
+  const content = p.content || (mk?'[标记位]':(bi?'[内置插槽]':'[空]'));
+  const has = p.content && p.content.length > 0;
+  const rc = `tag-role-${p.role||'system'}`;
+
+  let inj = '';
+  if(p.injection_position !== undefined && !bi) {
+    const pl = p.injection_position===0?'对话前':p.injection_position===1?'对话内':`位置${p.injection_position}`;
+    inj = `<span class="tag tag-injection">注入:${pl} 深度:${p.injection_depth??'-'}</span>`;
   }
-  updateSelectBar();
-  updateSelectAllCheckbox();
+
+  return `
+    <div class="prompt-card ${cls}" data-uid="${ea(p._uid)}">
+      <div class="prompt-header">
+        <div class="prompt-checkbox ${sel?'checked':''}" onclick="toggleSel('${ea(p._uid)}',event)"></div>
+        <div class="prompt-index">${num}</div>
+        <div class="prompt-info" onclick="togCard(this.parentElement)">
+          <div class="prompt-name">${eh(p._displayName)}</div>
+          <div class="prompt-meta">
+            <span class="tag ${rc}">${p.role||'system'}</span>
+            <span class="tag ${en?'tag-enabled':'tag-disabled'}">${en?'已启用':'已禁用'}</span>
+            ${mk?'<span class="tag tag-marker">Marker</span>':''}
+            ${bi?'<span class="tag tag-slot">内置插槽</span>':''}
+            ${p.system_prompt?'<span class="tag tag-sys-prompt">系统提示</span>':''}
+            ${inj}
+          </div>
+        </div>
+        <div class="prompt-toggle" onclick="togCard(this.parentElement)">▼</div>
+      </div>
+      <div class="prompt-body">
+        <div class="prompt-detail-grid">
+          <div class="detail-item"><span class="dk">标识符:</span> <span class="dv" style="font-size:11px;word-break:break-all;">${eh(p.identifier)}</span></div>
+          <div class="detail-item"><span class="dk">角色:</span> <span class="dv">${p.role||'system'}</span></div>
+          <div class="detail-item"><span class="dk">标记位:</span> <span class="dv">${p.marker?'是':'否'}</span></div>
+          ${p.injection_position!==undefined?`
+            <div class="detail-item"><span class="dk">注入位置:</span> <span class="dv">${p.injection_position}</span></div>
+            <div class="detail-item"><span class="dk">注入深度:</span> <span class="dv">${p.injection_depth??'-'}</span></div>
+            <div class="detail-item"><span class="dk">注入顺序:</span> <span class="dv">${p.injection_order??'-'}</span></div>`:''}
+        </div>
+        ${has?`
+        <div class="prompt-content-wrapper">
+          <div class="prompt-content-label">内容 (${p.content.length}字符)
+            <button class="copy-btn" onclick="copySingle(this,'${ea(p._uid)}')">复制</button>
+          </div>
+          <div class="prompt-content">${eh(content)}</div>
+        </div>`:`
+        <div class="prompt-content-wrapper">
+          <div class="prompt-content-label">内容</div>
+          <div class="prompt-content" style="color:#999;font-style:italic;">${eh(content)}</div>
+        </div>`}
+      </div>
+    </div>`;
 }
 
-function toggleSelectAll(checked) {
-  filteredPrompts.forEach(p => {
-    if (checked) selectedSet.add(p._uid);
-    else selectedSet.delete(p._uid);
+// =====================================================================
+//  交互
+// =====================================================================
+function togCard(h){ h.closest('.prompt-card').classList.toggle('open'); }
+function toggleAll(o){ document.querySelectorAll('.prompt-card').forEach(c=>c.classList.toggle('open',o)); }
+
+function toggleSel(uid,e){
+  e.stopPropagation();
+  selectedSet.has(uid) ? selectedSet.delete(uid) : selectedSet.add(uid);
+  const c = document.querySelector(`.prompt-card[data-uid="${CSS.escape(uid)}"]`);
+  if(c){
+    c.classList.toggle('selected',selectedSet.has(uid));
+    c.querySelector('.prompt-checkbox')?.classList.toggle('checked',selectedSet.has(uid));
+  }
+  updateSelectBar(); updateSelectAllCheckbox();
+}
+
+function toggleSelectAll(chk){
+  filteredPrompts.forEach(p=>{ chk ? selectedSet.add(p._uid) : selectedSet.delete(p._uid); });
+  document.querySelectorAll('#promptList > .prompt-card').forEach(c=>{
+    const u=c.dataset.uid;
+    c.classList.toggle('selected',selectedSet.has(u));
+    c.querySelector('.prompt-checkbox')?.classList.toggle('checked',selectedSet.has(u));
   });
-  document.querySelectorAll('.prompt-card').forEach(card => {
-    const uid = card.dataset.uid;
-    const cb = card.querySelector('.prompt-checkbox');
-    card.classList.toggle('selected', selectedSet.has(uid));
-    cb?.classList.toggle('checked', selectedSet.has(uid));
-  });
   updateSelectBar();
 }
 
-function updateSelectAllCheckbox() {
-  const cb = document.getElementById('selectAllCb');
-  if (!cb || !filteredPrompts.length) { if (cb) { cb.checked = false; cb.indeterminate = false; } return; }
-  const sel = filteredPrompts.filter(p => selectedSet.has(p._uid)).length;
-  cb.checked = sel === filteredPrompts.length;
-  cb.indeterminate = sel > 0 && sel < filteredPrompts.length;
+function updateSelectAllCheckbox(){
+  const cb=document.getElementById('selectAllCb');
+  if(!cb||!filteredPrompts.length){if(cb){cb.checked=false;cb.indeterminate=false;}return;}
+  const s=filteredPrompts.filter(p=>selectedSet.has(p._uid)).length;
+  cb.checked=s===filteredPrompts.length;
+  cb.indeterminate=s>0&&s<filteredPrompts.length;
 }
 
-function clearSelection() {
+function clearSelection(){
   selectedSet.clear();
-  document.querySelectorAll('.prompt-card').forEach(c => {
+  document.querySelectorAll('.prompt-card').forEach(c=>{
     c.classList.remove('selected');
     c.querySelector('.prompt-checkbox')?.classList.remove('checked');
   });
+  updateSelectBar(); updateSelectAllCheckbox();
+}
+
+// =====================================================================
+//  拼接
+// =====================================================================
+function onSepChange(){
+  document.getElementById('customSep').style.display=
+    document.getElementById('sepType').value==='custom'?'inline-block':'none';
   updateSelectBar();
-  updateSelectAllCheckbox();
+}
+function getSep(){
+  const t=document.getElementById('sepType').value;
+  return t==='newline'?'\n':t==='double-newline'?'\n\n':t==='divider'?'\n\n---\n\n':t==='none'?'':
+    t==='custom'?(document.getElementById('customSep').value||''):'\n\n';
+}
+function getCombined(){
+  const all=[...orderedPrompts,...orphanPrompts];
+  return all.filter(p=>selectedSet.has(p._uid)).map(p=>p.content||'').filter(Boolean).join(getSep());
+}
+function getSelInfo(){
+  const all=[...orderedPrompts,...orphanPrompts];
+  return all.filter(p=>selectedSet.has(p._uid)).map(p=>({name:p._displayName}));
+}
+
+function updateSelectBar(){
+  const bar=document.getElementById('selectBar');
+  const n=selectedSet.size;
+  document.getElementById('selCount').textContent=n;
+  if(n>0){bar.classList.add('visible');document.getElementById('selChars').textContent=`· ${getCombined().length}字符`;}
+  else bar.classList.remove('visible');
 }
 
 // =====================================================================
-//  Separator / Combined
+//  复制
 // =====================================================================
-function onSepChange() {
-  document.getElementById('customSep').style.display =
-    document.getElementById('sepType').value === 'custom' ? 'inline-block' : 'none';
-  updateSelectBar();
+function copyAllSelected(){ const t=getCombined();if(!t)return;doCopy(t,document.getElementById('btnCopyAll'),'📋 复制拼接'); }
+function copyFromModal(){ const t=getCombined();if(!t)return;doCopy(t,document.getElementById('modalCopyBtn'),'📋 复制全部'); }
+function copySingle(btn,uid){
+  const all=[...orderedPrompts,...orphanPrompts];
+  const p=all.find(x=>x._uid===uid);if(!p?.content)return;doCopy(p.content,btn,'复制');
 }
-function getSeparator() {
-  const t = document.getElementById('sepType').value;
-  if (t === 'newline') return '\n';
-  if (t === 'double-newline') return '\n\n';
-  if (t === 'divider') return '\n\n---\n\n';
-  if (t === 'none') return '';
-  if (t === 'custom') return document.getElementById('customSep').value || '';
-  return '\n\n';
-}
-function getCombinedText() {
-  const sorted = orderedPrompts.filter(p => selectedSet.has(p._uid));
-  return sorted.map(p => p.content || '').filter(t => t).join(getSeparator());
-}
-function getSelectedInfo() {
-  return orderedPrompts.filter(p => selectedSet.has(p._uid))
-    .map(p => ({ uid: p._uid, name: p._displayName || p.name || p.identifier }));
-}
-
-// =====================================================================
-//  Select Bar
-// =====================================================================
-function updateSelectBar() {
-  const bar = document.getElementById('selectBar');
-  const count = selectedSet.size;
-  document.getElementById('selCount').textContent = count;
-  if (count > 0) {
-    bar.classList.add('visible');
-    document.getElementById('selChars').textContent = `· ${getCombinedText().length} 字符`;
-  } else {
-    bar.classList.remove('visible');
-  }
-}
-
-// =====================================================================
-//  Copy
-// =====================================================================
-function copyAllSelected() {
-  const t = getCombinedText(); if (!t) return;
-  doCopy(t, document.getElementById('btnCopyAll'), '📋 复制拼接');
-}
-function copyFromModal() {
-  const t = getCombinedText(); if (!t) return;
-  doCopy(t, document.getElementById('modalCopyBtn'), '📋 复制全部');
-}
-function copySingle(btn, uid) {
-  const p = orderedPrompts.find(x => x._uid === uid);
-  if (!p?.content) return;
-  doCopy(p.content, btn, '复制');
-}
-function doCopy(text, btn, label) {
-  navigator.clipboard.writeText(text).then(() => {
-    btn.textContent = '✅ 已复制!'; btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = label; btn.classList.remove('copied'); }, 2000);
-  }).catch(() => {
-    const ta = document.createElement('textarea');
-    ta.value = text; document.body.appendChild(ta); ta.select();
-    document.execCommand('copy'); document.body.removeChild(ta);
-    btn.textContent = '✅ 已复制!'; btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = label; btn.classList.remove('copied'); }, 2000);
+function doCopy(text,btn,lbl){
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.textContent='✅ 已复制!';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent=lbl;btn.classList.remove('copied');},2000);
+  }).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);
+    ta.select();document.execCommand('copy');document.body.removeChild(ta);
+    btn.textContent='✅ 已复制!';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent=lbl;btn.classList.remove('copied');},2000);
   });
 }
 
 // =====================================================================
-//  Preview Modal
+//  预览弹窗
 // =====================================================================
-function showPreviewModal() {
-  const info = getSelectedInfo();
-  const combined = getCombinedText();
-  document.getElementById('modalSelectedList').innerHTML = info.map((it, i) =>
-    `<span class="selected-chip"><span class="chip-num">${i+1}</span>${escHtml(it.name)}</span>`
-  ).join('');
-  document.getElementById('modalCombinedText').textContent = combined;
-  document.getElementById('modalCharInfo').textContent = `共 ${info.length} 条 · ${combined.length} 字符`;
+function showPreviewModal(){
+  const info=getSelInfo(), combined=getCombined();
+  document.getElementById('modalSelectedList').innerHTML=info.map((it,i)=>
+    `<span class="selected-chip"><span class="chip-num">${i+1}</span>${eh(it.name)}</span>`).join('');
+  document.getElementById('modalCombinedText').textContent=combined;
+  document.getElementById('modalCharInfo').textContent=`共${info.length}条 · ${combined.length}字符`;
   document.getElementById('previewModal').classList.add('visible');
-  document.body.style.overflow = 'hidden';
+  document.body.style.overflow='hidden';
 }
-function closePreviewModal() {
+function closePreviewModal(){
   document.getElementById('previewModal').classList.remove('visible');
-  document.body.style.overflow = '';
+  document.body.style.overflow='';
 }
-document.getElementById('previewModal').addEventListener('click', function(e) { if (e.target === this) closePreviewModal(); });
-document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closePreviewModal(); });
+document.getElementById('previewModal').addEventListener('click',function(e){if(e.target===this)closePreviewModal();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closePreviewModal();});
 
 // =====================================================================
-//  Info / Stats / Params
+//  文件信息 / 统计 / 参数
 // =====================================================================
-function showFileInfo(fileName) {
-  const div = document.getElementById('fileInfo');
-  div.style.display = 'block';
-  const entries = (presetData.prompt_order || []);
-  div.innerHTML = `
-    <div class="stat-card" style="margin-bottom:16px;text-align:left;">
-      <div style="font-size:14px;font-weight:700;">✅ ${escHtml(fileName)}</div>
-      <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">
-        prompts 数组: ${presetData.prompts.length} 条
-        · prompt_order: ${entries.length} 套方案
-        · 当前使用: 方案 ${selectedOrderIdx + 1} (${orderedPrompts.length} 条)
-      </div>
-    </div>
-  `;
+function showFileInfo(fn){
+  const d=document.getElementById('fileInfo'); d.style.display='block';
+  d.innerHTML=`<div class="stat-card" style="margin-bottom:16px;text-align:left;">
+    <div style="font-size:14px;font-weight:700;">✅ ${eh(fn)}</div>
+    <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">
+      prompts数组: ${presetData.prompts.length}条 ·
+      prompt_order[${selectedOrderIdx}]: ${orderedPrompts.length}条
+      ${orphanPrompts.length?` · 未在排序中: ${orphanPrompts.length}条`:''}
+    </div></div>`;
 }
 
-function showStats() {
-  const all = orderedPrompts;
-  const total = all.length;
-  const enabled = all.filter(p => p._orderEnabled).length;
-  const builtins = all.filter(p => p._isBuiltinSlot || BUILTIN_META[p.identifier]).length;
-  const custom = total - builtins;
-
-  document.getElementById('statsBar').style.display = 'flex';
-  document.getElementById('statsBar').innerHTML = `
-    <div class="stat-card"><div class="num">${total}</div><div class="desc">总条目</div></div>
-    <div class="stat-card"><div class="num" style="color:var(--enabled)">${enabled}</div><div class="desc">已启用</div></div>
-    <div class="stat-card"><div class="num" style="color:var(--disabled)">${total - enabled}</div><div class="desc">已禁用</div></div>
-    <div class="stat-card"><div class="num" style="color:#3498db">${custom}</div><div class="desc">自定义</div></div>
-    <div class="stat-card"><div class="num" style="color:var(--marker)">${builtins}</div><div class="desc">内置/插槽</div></div>
-  `;
+function showStats(){
+  const t=orderedPrompts.length, en=orderedPrompts.filter(p=>p._enabled).length;
+  document.getElementById('statsBar').style.display='flex';
+  document.getElementById('statsBar').innerHTML=`
+    <div class="stat-card"><div class="num">${t}</div><div class="desc">prompt_order条目</div></div>
+    <div class="stat-card"><div class="num" style="color:var(--enabled)">${en}</div><div class="desc">已启用</div></div>
+    <div class="stat-card"><div class="num" style="color:var(--disabled)">${t-en}</div><div class="desc">已禁用</div></div>
+    ${orphanPrompts.length?`<div class="stat-card"><div class="num" style="color:#c0392b">${orphanPrompts.length}</div><div class="desc">不在排序中</div></div>`:''}`;
 }
 
-function showParams() {
-  const keys = [
-    'temperature','top_p','top_k','top_a','min_p',
-    'frequency_penalty','presence_penalty','repetition_penalty',
-    'openai_max_context','openai_max_tokens',
-    'names_behavior','stream_openai','reasoning_effort'
-  ];
-  const section = document.getElementById('paramsSection');
-  let has = false;
-  let html = '<h3>⚙️ 模型参数</h3><div class="params-grid">';
-  keys.forEach(k => {
-    if (presetData[k] !== undefined) {
-      has = true;
-      html += `<div class="param-item"><span class="key">${k}</span><span class="val">${presetData[k]}</span></div>`;
-    }
+function showParams(){
+  const keys=['temperature','top_p','top_k','top_a','min_p','frequency_penalty','presence_penalty',
+    'repetition_penalty','openai_max_context','openai_max_tokens','names_behavior','stream_openai','reasoning_effort'];
+  const sec=document.getElementById('paramsSection');
+  let has=false, html='<h3>⚙️ 模型参数</h3><div class="params-grid">';
+  keys.forEach(k=>{if(presetData[k]!==undefined){has=true;
+    html+=`<div class="param-item"><span class="key">${k}</span><span class="val">${presetData[k]}</span></div>`;}});
+  html+='</div>';
+  if(has){sec.style.display='block';sec.innerHTML=html;}else sec.style.display='none';
+}
+
+// =====================================================================
+//  导出
+// =====================================================================
+function exportData(){
+  if(!orderedPrompts.length)return;
+  const L=[];
+  L.push('# 预设提取结果\n',`生成时间: ${new Date().toLocaleString('zh-CN')}`,
+    `prompt_order[${selectedOrderIdx}]: ${orderedPrompts.length}条`,
+    `已启用: ${orderedPrompts.filter(p=>p._enabled).length}`,
+    orphanPrompts.length?`不在排序中: ${orphanPrompts.length}条`:'','','---\n');
+  orderedPrompts.forEach((p,i)=>{
+    L.push(`## ${i+1}. ${p._displayName}`,'',
+      `- **标识符**: ${p.identifier}`,`- **角色**: ${p.role||'system'}`,
+      `- **状态**: ${p._enabled?'✅ 已启用':'❌ 已禁用'}`,
+      `- **标记位**: ${p.marker?'是':'否'}`);
+    if(p.injection_position!==undefined)
+      L.push(`- **注入**: 位置=${p.injection_position} 深度=${p.injection_depth??'-'} 顺序=${p.injection_order??'-'}`);
+    L.push('');
+    if(p.content){L.push('```',p.content,'```');}else if(p.marker)L.push('*[标记位]*');
+    L.push('','---\n');
   });
-  html += '</div>';
-  if (has) { section.style.display = 'block'; section.innerHTML = html; }
-  else section.style.display = 'none';
+  if(orphanPrompts.length){
+    L.push('\n# 不在 prompt_order 中的条目\n');
+    orphanPrompts.forEach(p=>{
+      L.push(`## [孤] ${p.name||p.identifier}`,`- 标识符: ${p.identifier}`);
+      if(p.content){L.push('```',p.content,'```');}
+      L.push('---\n');
+    });
+  }
+  const b=new Blob([L.join('\n')],{type:'text/markdown;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);
+  a.download=`preset_${Date.now()}.md`;a.click();URL.revokeObjectURL(a.href);
 }
 
 // =====================================================================
-//  Export
-// =====================================================================
-function exportData() {
-  if (!orderedPrompts.length) return;
-  const lines = [];
-  lines.push('# 预设提取结果\n');
-  lines.push(`生成时间: ${new Date().toLocaleString('zh-CN')}`);
-  lines.push(`排序方案: 方案 ${selectedOrderIdx + 1}`);
-  lines.push(`总条目数: ${orderedPrompts.length}`);
-  lines.push(`已启用: ${orderedPrompts.filter(p => p._orderEnabled).length}`);
-  lines.push(''); lines.push('---\n');
-
-  orderedPrompts.forEach((p, i) => {
-    lines.push(`## ${i + 1}. ${p._displayName || p.name || p.identifier}`);
-    lines.push('');
-    lines.push(`- **标识符**: ${p.identifier}`);
-    lines.push(`- **角色**: ${p.role || 'system'}`);
-    lines.push(`- **状态**: ${p._orderEnabled ? '✅ 已启用' : '❌ 已禁用'}`);
-    lines.push(`- **标记位**: ${p.marker ? '是' : '否'}`);
-    if (p._isBuiltinSlot) lines.push(`- **类型**: 内置插槽`);
-    if (p.injection_position !== undefined) {
-      lines.push(`- **注入**: 位置=${p.injection_position} 深度=${p.injection_depth ?? '-'} 顺序=${p.injection_order ?? '-'}`);
-    }
-    lines.push('');
-    if (p.content) { lines.push('```'); lines.push(p.content); lines.push('```'); }
-    else if (p.marker) lines.push('*[标记位]*');
-    lines.push(''); lines.push('---\n');
-  });
-
-  const blob = new Blob([lines.join('\n')], { type: 'text/markdown;charset=utf-8' });
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-  a.download = `preset_${Date.now()}.md`; a.click(); URL.revokeObjectURL(a.href);
-}
-
-// =====================================================================
-//  Utility
-// =====================================================================
-function escHtml(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
-function escAttr(s) { return (s || '').replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
+function eh(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
+function ea(s){return(s||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');}
 </script>
 </body>
 </html>
